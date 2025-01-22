@@ -36,6 +36,8 @@ public class RolImplement implements RolService {
 
     @Override
     public void guardar(RolDto rolDto) {
+        String nombre = rolDto.getNombre().toUpperCase();
+        rolDto.setNombre(nombre);
         repository.save(rolMapper.toEntity(rolDto));
     }
     @Transactional

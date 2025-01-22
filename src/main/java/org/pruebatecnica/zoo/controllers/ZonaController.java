@@ -57,4 +57,10 @@ public class ZonaController {
         service.editarZona(zonaDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping({"/cantidad-animales/{id}"})
+    public ResponseEntity<?> findCantidadAnimalesZona(@PathVariable int id) {
+        return new ResponseEntity<>(service.cantidadAnimales(id), HttpStatus.OK);
+    }
 }

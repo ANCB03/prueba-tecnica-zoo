@@ -1,13 +1,15 @@
 package org.pruebatecnica.zoo.implement;
 
 import lombok.RequiredArgsConstructor;
-import org.pruebatecnica.zoo.dtos.AnimalCompletoDto;
-import org.pruebatecnica.zoo.dtos.AnimalDto;
+import org.pruebatecnica.zoo.dtos.*;
 import org.pruebatecnica.zoo.entities.Animal;
 import org.pruebatecnica.zoo.entities.Especie;
+import org.pruebatecnica.zoo.exceptions.BadRequestException;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.mappers.AnimalCompletoMapper;
 import org.pruebatecnica.zoo.mappers.AnimalMapper;
+import org.pruebatecnica.zoo.mappers.AnimalResponseMapper;
+import org.pruebatecnica.zoo.mappers.ZonaMapper;
 import org.pruebatecnica.zoo.repositories.AnimalRepository;
 import org.pruebatecnica.zoo.repositories.EspecieRepository;
 import org.pruebatecnica.zoo.services.AnimalService;
@@ -15,9 +17,12 @@ import org.pruebatecnica.zoo.util.MessageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,20 +36,24 @@ public class AnimalImplement implements AnimalService {
 
     private final AnimalMapper animalMapper;
 
+    private final AnimalResponseMapper animalResponseMapper;
+
+    private final ZonaMapper zonaMapper;
+
     private final AnimalCompletoMapper animalCompletoMapper;
 
     private final MessageUtil messageUtil;
     @Override
-    public List<AnimalDto> listarAnimaless() {
-        return animalMapper.toAnimallist(repository.findAll());
+    public List<AnimalResponse> listarAnimaless() {
+        return animalResponseMapper.toAnimallist(repository.findAll());
     }
 
     @Override
     public void guardar(AnimalDto animalDto) {
         ZoneId colombiaZone = ZoneId.of("America/Bogota");
-        ZonedDateTime fechaHoraColombia = ZonedDateTime.now(colombiaZone);
-        LocalDateTime fechaHoraActual = fechaHoraColombia.toLocalDateTime();
-        animalDto.setFecha(fechaHoraActual);
+        ZonedDateTime fechaColombia = ZonedDateTime.now(colombiaZone);
+        LocalDate fechaActual = fechaColombia.toLocalDate();
+        animalDto.setFecha(fechaActual);
         repository.save(animalMapper.toEntity(animalDto));
     }
 
@@ -87,5 +96,43 @@ public class AnimalImplement implements AnimalService {
 
         repository.save(animal);
         return animalMapper.toDto(animal);
+    }
+
+    @Override
+    public List<AnimalPorFechaResponse> animalesPorFecha(String fecha) {
+        if (esFechaValida(fecha)){
+            LocalDate fecha1 = LocalDate.parse(fecha);
+        List<Animal> animales = repository.findByFecha(fecha1);
+        if (!animales.isEmpty()){
+            List<AnimalPorFechaResponse> animalesPorFechaResponses = new ArrayList<>();
+            for (Animal animal: animales){
+                AnimalPorFechaResponse animalPorFechaResponse = new AnimalPorFechaResponse();
+                animalPorFechaResponse.setIdAnimal(animal.getIdAnimal());
+                animalPorFechaResponse.setNombre(animal.getNombreAnimal());
+                animalPorFechaResponse.setFecha(animal.getFecha());
+                EspecieResponse especieResponse = new EspecieResponse();
+                especieResponse.setIdEspecie(animal.getEspecie().getIdEspecie());
+                especieResponse.setNombreEspecie(animal.getEspecie().getNombreEspecie());
+                especieResponse.setZona(zonaMapper.toDto(animal.getEspecie().getZona()));
+                animalPorFechaResponse.setEspecie(especieResponse);
+                animalesPorFechaResponses.add(animalPorFechaResponse);
+            }
+            return animalesPorFechaResponses;
+        }else{
+            throw new NotFoundException(messageUtil.getMessage("AnimalPorFechaNotFound", null, Locale.getDefault()));
+        }
+        }else{
+            throw new BadRequestException(messageUtil.getMessage("BadRequestFecha",null, Locale.getDefault()));
+        }
+    }
+
+    public boolean esFechaValida(String fecha) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            LocalDate.parse(fecha, formatter);
+            return true; // La fecha es válida
+        } catch (DateTimeParseException e) {
+            return false; // La fecha no es válida
+        }
     }
 }

@@ -3,6 +3,7 @@ package org.pruebatecnica.zoo.implement;
 import lombok.RequiredArgsConstructor;
 import org.pruebatecnica.zoo.dtos.UsuarioCompletoDto;
 import org.pruebatecnica.zoo.dtos.UsuarioDto;
+import org.pruebatecnica.zoo.dtos.UsuarioResponse;
 import org.pruebatecnica.zoo.dtos.UsuarioSinPasswordDto;
 import org.pruebatecnica.zoo.entities.Rol;
 import org.pruebatecnica.zoo.entities.Usuario;
@@ -10,6 +11,7 @@ import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.UsuarioCompletoMapper;
 import org.pruebatecnica.zoo.mappers.UsuarioMapper;
+import org.pruebatecnica.zoo.mappers.UsuarioResponseMapper;
 import org.pruebatecnica.zoo.repositories.RolRepository;
 import org.pruebatecnica.zoo.repositories.UsuarioRepository;
 import org.pruebatecnica.zoo.services.UsuarioService;
@@ -30,14 +32,16 @@ public class UsuarioImplement implements UsuarioService {
 
     private final UsuarioMapper usuarioMapper;
 
+    private final UsuarioResponseMapper usuarioResponseMapper;
+
     private final UsuarioCompletoMapper usuarioCompletoMapper;
 
     private final MessageUtil messageUtil;
 
     //private final BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
-    public List<UsuarioSinPasswordDto> listarUsuarios() {
-        return usuarioMapper.toUsuariolist(repository.findAll());
+    public List<UsuarioResponse> listarUsuarios() {
+        return usuarioResponseMapper.toUsuariolist(repository.findAll());
     }
 
     @Override

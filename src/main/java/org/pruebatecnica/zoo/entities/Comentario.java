@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -45,4 +47,7 @@ public class Comentario implements Serializable {
     @ManyToOne
     @JoinColumn(updatable = false ,name = "idComentarioPadre")
     private Comentario comentarioPadre;
+
+    @OneToMany(mappedBy = "comentarioPadre", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comentario> comentariosHijos = new ArrayList<>();
 }

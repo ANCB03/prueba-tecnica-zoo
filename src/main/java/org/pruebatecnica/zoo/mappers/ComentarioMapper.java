@@ -9,12 +9,12 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ComentarioMapper {
     @Mapping(source = "idAutor", target = "autor.idUsuario")
-    @Mapping(source = "idComentario", target = "comentarioPadre.idComentario")
+    @Mapping(source = "idComentarioPadre", target = "comentarioPadre.idComentario")
     @Mapping(source = "idAnimal", target = "animal.idAnimal")
     Comentario toEntity(ComentarioDto comentarioDto);
 
     @Mapping(source = "autor.idUsuario", target = "idAutor")
-    @Mapping(source = "comentarioPadre.idComentario", target = "idComentario")
+    @Mapping(source = "comentarioPadre.idComentario", target = "idComentarioPadre")
     @Mapping(source = "animal.idAnimal", target = "idAnimal")
     ComentarioDto toDto(Comentario comentario);
 

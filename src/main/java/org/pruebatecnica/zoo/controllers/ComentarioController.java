@@ -54,4 +54,9 @@ public class ComentarioController {
         service.editarComentario(comentarioDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping({"/porcentaje"})
+    public ResponseEntity<?> findPorcentaje() {
+        return new ResponseEntity<>(service.calcularPromedioComentariosRespuestas(), HttpStatus.OK);
+    }
 }

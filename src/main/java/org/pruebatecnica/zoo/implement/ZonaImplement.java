@@ -1,9 +1,9 @@
 package org.pruebatecnica.zoo.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.pruebatecnica.zoo.dtos.CantidadAnimalesResponse;
 import org.pruebatecnica.zoo.dtos.ZonaCompletoDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
-import org.pruebatecnica.zoo.dtos.ZonaRequest;
 import org.pruebatecnica.zoo.entities.Especie;
 import org.pruebatecnica.zoo.entities.Zona;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,10 @@ public class ZonaImplement implements ZonaService {
 
     @Override
     public void guardar(ZonaDto zonaDto) {
+        Optional<Zona> zonaFound = repository.findByNombre(zonaDto.getNombreZona());
+        if(zonaFound.isPresent()){
+            throw new WithReferencesException(messageUtil.getMessage("ZonaExists", null, Locale.getDefault()));
+        }
         repository.save(zonaMapper.toEntity(zonaDto));
     }
 
@@ -80,5 +85,26 @@ public class ZonaImplement implements ZonaService {
         }
         repository.save(zona);
         return zonaMapper.toDto(zona);
+    }
+    @Transactional
+    @Override
+    public CantidadAnimalesResponse cantidadAnimales(int idZona) {
+        Zona zona = repository.findById(idZona) .orElseThrow(
+                () -> new NotFoundException(messageUtil.getMessage("ZonaNotFound", null, Locale.getDefault()))
+        );
+        CantidadAnimalesResponse cantidadAnimalesResponse = new CantidadAnimalesResponse();
+        if (!zona.getEspecies().isEmpty()) {
+            int contador = 0;
+            List<Especie> especies = zona.getEspecies();
+            for(Especie especie: especies){
+                if(!especie.getAnimales().isEmpty()){
+                    contador += especie.getAnimales().size();
+                }
+            }
+            cantidadAnimalesResponse.setIdZona(idZona);
+            cantidadAnimalesResponse.setNombreZona(zona.getNombreZona());
+            cantidadAnimalesResponse.setCantidadAnimales(contador);
+        }
+        return cantidadAnimalesResponse;
     }
 }

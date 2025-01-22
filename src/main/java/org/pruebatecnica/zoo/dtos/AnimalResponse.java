@@ -5,19 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnimalSinEspecieDto {
+public class AnimalResponse {
     private int idAnimal;
 
-    @NotBlank(message = "se requiere el nombre del animal")
     private String nombreAnimal;
 
     private LocalDate fecha;
+
+    private EspecieResponse especie;
 }

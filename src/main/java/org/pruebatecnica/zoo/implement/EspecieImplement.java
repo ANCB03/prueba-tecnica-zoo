@@ -1,14 +1,17 @@
 package org.pruebatecnica.zoo.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.pruebatecnica.zoo.dtos.CantidadAnimalesEspecie;
 import org.pruebatecnica.zoo.dtos.EspecieCompletoDto;
 import org.pruebatecnica.zoo.dtos.EspecieDto;
+import org.pruebatecnica.zoo.dtos.EspecieResponse;
 import org.pruebatecnica.zoo.entities.Especie;
 import org.pruebatecnica.zoo.entities.Zona;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.EspecieCompletoMapper;
 import org.pruebatecnica.zoo.mappers.EspecieMapper;
+import org.pruebatecnica.zoo.mappers.EspecieResponseMapper;
 import org.pruebatecnica.zoo.repositories.EspecieRepository;
 import org.pruebatecnica.zoo.repositories.ZonaRepository;
 import org.pruebatecnica.zoo.services.EspecieService;
@@ -29,16 +32,22 @@ public class EspecieImplement implements EspecieService {
 
     private final EspecieMapper especieMapper;
 
+    private final EspecieResponseMapper especieResponseMapper;
+
     private final EspecieCompletoMapper especieCompletoMapper;
 
     private final MessageUtil messageUtil;
     @Override
-    public List<EspecieDto> listarEspecies() {
-        return especieMapper.toEspecielist(repository.findAll());
+    public List<EspecieResponse> listarEspecies() {
+        return especieResponseMapper.toEspecielist(repository.findAll());
     }
 
     @Override
     public void guardar(EspecieDto especieDto) {
+                Optional<Especie> especieFound = repository.findByNombre(especieDto.getNombreEspecie());
+                if (especieFound.isPresent()){
+                    throw new WithReferencesException(messageUtil.getMessage("EspecieExists",null, Locale.getDefault()));
+                }
                 Especie especie = new Especie();
                 if(especieDto.getIdZona() != 0){
                     Zona zona = zonaRepository.findById(especieDto.getIdZona()).orElseThrow(
@@ -88,5 +97,19 @@ public class EspecieImplement implements EspecieService {
         }
         repository.save(especie);
         return especieMapper.toDto(especie);
+    }
+    @Transactional
+    @Override
+    public CantidadAnimalesEspecie cantidadAnimales(int idEspecie) {
+        Especie especie = repository.findById(idEspecie) .orElseThrow(
+                () -> new NotFoundException(messageUtil.getMessage("EspecieNotFound", null, Locale.getDefault()))
+        );
+        CantidadAnimalesEspecie cantidadAnimalesResponse = new CantidadAnimalesEspecie();
+        cantidadAnimalesResponse.setIdEspecie(idEspecie);
+        cantidadAnimalesResponse.setNombreEspecie(especie.getNombreEspecie());
+        if (!especie.getAnimales().isEmpty()) {
+            cantidadAnimalesResponse.setCantidadAnimales(especie.getAnimales().size());
+        }
+        return cantidadAnimalesResponse;
     }
 }

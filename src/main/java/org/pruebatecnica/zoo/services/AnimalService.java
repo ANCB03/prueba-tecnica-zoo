@@ -1,14 +1,12 @@
 package org.pruebatecnica.zoo.services;
 
-import org.pruebatecnica.zoo.dtos.AnimalCompletoDto;
-import org.pruebatecnica.zoo.dtos.AnimalDto;
-import org.pruebatecnica.zoo.dtos.RolCompletoDto;
-import org.pruebatecnica.zoo.dtos.RolDto;
+import org.pruebatecnica.zoo.dtos.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AnimalService {
-    public List<AnimalDto> listarAnimaless();
+    public List<AnimalResponse> listarAnimaless();
 
     public void guardar(AnimalDto animalDto);
 
@@ -17,4 +15,6 @@ public interface AnimalService {
     public AnimalCompletoDto encontrarAnimalById(int id);
 
     public AnimalDto editarAnimal(AnimalDto animalDto);
+
+    public List<AnimalPorFechaResponse> animalesPorFecha(String fecha);
 }

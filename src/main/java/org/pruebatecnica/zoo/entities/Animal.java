@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Animal implements Serializable {
     @Column(length = 20, nullable = false)
     private String nombreAnimal;
 
-    private LocalDateTime fecha;
+    private LocalDate fecha;
 
     @ManyToOne
     @JoinColumn(name = "idEspecie")

@@ -1,5 +1,6 @@
 package org.pruebatecnica.zoo.services;
 
+import org.pruebatecnica.zoo.dtos.CantidadAnimalesResponse;
 import org.pruebatecnica.zoo.dtos.ZonaCompletoDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
 import org.pruebatecnica.zoo.dtos.ZonaRequest;
@@ -16,4 +17,6 @@ public interface ZonaService {
     public ZonaCompletoDto encontrarZonaById(int id);
 
     public ZonaDto editarZona(ZonaDto zonaDto);
+
+    public CantidadAnimalesResponse cantidadAnimales(int idZona);
 }

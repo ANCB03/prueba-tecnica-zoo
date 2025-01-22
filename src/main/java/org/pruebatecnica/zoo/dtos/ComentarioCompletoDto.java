@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +15,22 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnimalCompletoDto {
-    private int idAnimal;
+public class ComentarioCompletoDto {
+    private int idComentario;
 
-    @NotBlank(message = "se requiere el nombre del animal")
-    private String nombreAnimal;
+    private String mensaje;
 
-    private LocalDate fecha;
+    private LocalDateTime fecha;
 
-    @Min(value = 0, message = "El valor debe ser mayor o igual a 0.")
-    private int idEspecie;
+    private String tipo;
 
-    private List<ComentarioSinAnimalDto> comentarios = new ArrayList<>();
+    private boolean tablero;
+
+    private UsuarioResponse autor;
+
+    private AnimalResponse animal;
+
+    private int idComentarioPadre;
+
+    private List<ComentarioResponseSinCom> comentariosHijos = new ArrayList<>();
 }

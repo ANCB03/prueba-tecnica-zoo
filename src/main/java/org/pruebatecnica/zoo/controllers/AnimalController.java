@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,5 +54,10 @@ public class AnimalController {
     public ResponseEntity<?> editAnimal(@Valid @RequestBody AnimalDto animalDto) {
         service.editarAnimal(animalDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping({"/fecha/{fecha}"})
+    public ResponseEntity<?> findAnimalesFecha(@PathVariable String fecha) {
+        return new ResponseEntity<>(service.animalesPorFecha(fecha), HttpStatus.OK);
     }
 }

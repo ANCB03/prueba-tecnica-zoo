@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,7 +21,7 @@ public class AnimalDto {
     @NotBlank(message = "se requiere el nombre del animal")
     private String nombreAnimal;
 
-    private LocalDateTime fecha;
+    private LocalDate fecha;
 
     @Min(value = 0, message = "El valor debe ser mayor o igual a 0.")
     private int idEspecie;
