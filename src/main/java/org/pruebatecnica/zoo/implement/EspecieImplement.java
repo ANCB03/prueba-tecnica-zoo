@@ -64,7 +64,7 @@ public class EspecieImplement implements EspecieService {
         Especie especie = repository.findById(id).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("EspecieNotFound", null, Locale.getDefault()))
         );
-        if(!especie.getAnimales().isEmpty()){
+        if(especie.getAnimales().isEmpty()){
             repository.deleteById(id);
         }else{
             throw new WithReferencesException(messageUtil.getMessage("EspecieWithAnimals", null, Locale.getDefault()));
@@ -84,7 +84,11 @@ public class EspecieImplement implements EspecieService {
                 () -> new NotFoundException(messageUtil.getMessage("EspecieNotFound", null, Locale.getDefault()))
         );
 
-        if(especieDto.getNombreEspecie() != null){
+        if(especieDto.getNombreEspecie() != null && !especieDto.getNombreEspecie().equals(especie.getNombreEspecie())){
+            Optional<Especie> especieFound = repository.findByNombre(especieDto.getNombreEspecie());
+            if (especieFound.isPresent()){
+                throw new WithReferencesException(messageUtil.getMessage("EspecieExists",null, Locale.getDefault()));
+            }
             especie.setNombreEspecie(especieDto.getNombreEspecie());
         }
 

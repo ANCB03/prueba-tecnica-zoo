@@ -25,6 +25,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,10 @@ public class AnimalImplement implements AnimalService {
 
     @Override
     public void guardar(AnimalDto animalDto) {
+        Optional<Especie> especieFound = especieRepository.findById(animalDto.getIdEspecie());
+        if(especieFound.isEmpty()){
+            throw new NotFoundException(messageUtil.getMessage("EspecieNotFound", null, Locale.getDefault()));
+        }
         ZoneId colombiaZone = ZoneId.of("America/Bogota");
         ZonedDateTime fechaColombia = ZonedDateTime.now(colombiaZone);
         LocalDate fechaActual = fechaColombia.toLocalDate();

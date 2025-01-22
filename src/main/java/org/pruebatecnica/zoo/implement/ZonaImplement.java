@@ -77,8 +77,8 @@ public class ZonaImplement implements ZonaService {
         Zona zona = repository.findById(zonaDto.getIdZona()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("ZonaNotFound", null, Locale.getDefault()))
         );
-        if(zonaDto.getNombreZona() != null){
-            if(!repository.findByNombre(zonaDto.getNombreZona()).isEmpty()){
+        if(zonaDto.getNombreZona() != null && !zonaDto.getNombreZona().equals(zona.getNombreZona())){
+            if(repository.findByNombre(zonaDto.getNombreZona()).isPresent()){
                 throw new WithReferencesException(messageUtil.getMessage("ZonaExists", null, Locale.getDefault()));
             }
             zona.setNombreZona(zonaDto.getNombreZona());
