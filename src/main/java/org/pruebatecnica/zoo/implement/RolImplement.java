@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,10 @@ public class RolImplement implements RolService {
     @Override
     public void guardar(RolDto rolDto) {
         String nombre = rolDto.getNombre().toUpperCase();
+        Optional<Rol> rolFound = repository.findByNombre(nombre);
+        if(rolFound.isPresent()){
+            throw new WithReferencesException(messageUtil.getMessage("RolExists",null, Locale.getDefault()));
+        }
         rolDto.setNombre(nombre);
         repository.save(rolMapper.toEntity(rolDto));
     }
@@ -64,6 +69,11 @@ public class RolImplement implements RolService {
         Rol rol = repository.findById(rolDto.getIdRol()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("RolNotFound", null, Locale.getDefault()))
         );
+        String nombre = rolDto.getNombre().toUpperCase();
+        Optional<Rol> rolFound = repository.findByNombre(nombre);
+        if(rolFound.isPresent()){
+            throw new WithReferencesException(messageUtil.getMessage("RolExists",null, Locale.getDefault()));
+        }
         rolMapper.updateEntity(rolDto,rol);
         repository.save(rol);
         return rolMapper.toDto(rol);

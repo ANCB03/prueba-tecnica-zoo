@@ -13,7 +13,6 @@ import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.*;
 import org.pruebatecnica.zoo.repositories.AnimalRepository;
 import org.pruebatecnica.zoo.repositories.ComentarioRepository;
-import org.pruebatecnica.zoo.repositories.EspecieRepository;
 import org.pruebatecnica.zoo.repositories.UsuarioRepository;
 import org.pruebatecnica.zoo.services.ComentarioService;
 import org.pruebatecnica.zoo.util.MessageUtil;
@@ -105,27 +104,6 @@ public class ComentarioImplement implements ComentarioService {
             comentario.setMensaje(comentarioDto.getMensaje());
         }
 
-        if(comentarioDto.getFecha() != null){
-            comentario.setFecha(comentarioDto.getFecha());
-        }
-
-        if (comentarioDto.getIdAutor() != 0){
-            Usuario autor = usuarioRepository.findById(comentarioDto.getIdAutor()).orElseThrow(
-                    () -> new NotFoundException(messageUtil.getMessage("UsuarioNotFound", null, Locale.getDefault()))
-            );
-            if(autor != null){
-                comentario.setAutor(autor);
-            }
-        }
-
-        if(comentarioDto.getIdAnimal() != 0){
-            Animal animal = animalRepository.findById(comentarioDto.getIdAnimal()).orElseThrow(
-                    () -> new NotFoundException(messageUtil.getMessage("AnimalNotFound", null, Locale.getDefault()))
-            );
-            if(animal != null){
-                comentario.setAnimal(animal);
-            }
-        }
         repository.save(comentario);
         return comentarioMapper.toDto(comentario);
     }

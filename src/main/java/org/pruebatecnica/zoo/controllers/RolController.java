@@ -6,6 +6,7 @@ import org.pruebatecnica.zoo.dtos.RolDto;
 import org.pruebatecnica.zoo.services.RolService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,19 +22,19 @@ public class RolController {
 
     private Map<String,Object> response = new HashMap<>();
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
     public ResponseEntity<?> RolList(){
         return new ResponseEntity<>(service.listarRoles(), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/{id}"})
     public ResponseEntity<?> findRol(@PathVariable int id) {
         return new ResponseEntity<>(service.encontrarRolById(id), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/")
     public ResponseEntity<?> saveRol(@Valid @RequestBody RolDto rolDto) {
         response.clear();
@@ -42,7 +43,7 @@ public class RolController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRol(@PathVariable int id) {
         response.clear();
@@ -51,7 +52,7 @@ public class RolController {
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/")
     public ResponseEntity<?> editParqueadero(@Valid @RequestBody RolDto rolDto) {
         response.clear();

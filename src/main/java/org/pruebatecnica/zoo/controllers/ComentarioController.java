@@ -5,6 +5,7 @@ import org.pruebatecnica.zoo.dtos.ComentarioDto;
 import org.pruebatecnica.zoo.services.ComentarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,19 +21,19 @@ public class ComentarioController {
 
     private Map<String,Object> response = new HashMap<>();
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
     public ResponseEntity<?> ComentarioList(){
         return new ResponseEntity<>(service.listarComentarios(), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/{id}"})
     public ResponseEntity<?> findComentario(@PathVariable int id) {
         return new ResponseEntity<>(service.encontrarComentarioById(id), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
     @PostMapping("/")
     public ResponseEntity<?> saveComentario(@Valid @RequestBody ComentarioDto comentarioDto) {
         response.clear();
@@ -41,20 +42,21 @@ public class ComentarioController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteComentario(@PathVariable int id) {
         service.eliminar(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/")
     public ResponseEntity<?> editComentario(@Valid @RequestBody ComentarioDto comentarioDto) {
         service.editarComentario(comentarioDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/porcentaje"})
     public ResponseEntity<?> findPorcentaje() {
         return new ResponseEntity<>(service.calcularPromedioComentariosRespuestas(), HttpStatus.OK);

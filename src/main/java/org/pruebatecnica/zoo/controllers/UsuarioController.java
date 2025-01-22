@@ -5,6 +5,7 @@ import org.pruebatecnica.zoo.dtos.UsuarioDto;
 import org.pruebatecnica.zoo.services.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,19 +21,19 @@ public class UsuarioController {
 
     private Map<String,Object> response = new HashMap<>();
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
     public ResponseEntity<?> UsuarioList(){
         return new ResponseEntity<>(service.listarUsuarios(), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/{id}"})
     public ResponseEntity<?> findUsuario(@PathVariable int id) {
         return new ResponseEntity<>(service.encontrarUsuarioById(id), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/")
     public ResponseEntity<?> saveUsuario(@Valid @RequestBody UsuarioDto usuarioDto) {
         response.clear();
@@ -41,14 +42,14 @@ public class UsuarioController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUsuario(@PathVariable int id) {
         service.eliminar(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/")
     public ResponseEntity<?> editUsuario(@Valid @RequestBody UsuarioDto usuarioDto) {
         service.editarUsuario(usuarioDto);

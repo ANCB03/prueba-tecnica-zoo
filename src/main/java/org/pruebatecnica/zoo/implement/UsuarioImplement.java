@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.pruebatecnica.zoo.dtos.UsuarioCompletoDto;
 import org.pruebatecnica.zoo.dtos.UsuarioDto;
 import org.pruebatecnica.zoo.dtos.UsuarioResponse;
-import org.pruebatecnica.zoo.dtos.UsuarioSinPasswordDto;
 import org.pruebatecnica.zoo.entities.Rol;
 import org.pruebatecnica.zoo.entities.Usuario;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
+import org.pruebatecnica.zoo.mappers.UserDetailsMapper;
 import org.pruebatecnica.zoo.mappers.UsuarioCompletoMapper;
 import org.pruebatecnica.zoo.mappers.UsuarioMapper;
 import org.pruebatecnica.zoo.mappers.UsuarioResponseMapper;
@@ -16,6 +16,10 @@ import org.pruebatecnica.zoo.repositories.RolRepository;
 import org.pruebatecnica.zoo.repositories.UsuarioRepository;
 import org.pruebatecnica.zoo.services.UsuarioService;
 import org.pruebatecnica.zoo.util.MessageUtil;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +29,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UsuarioImplement implements UsuarioService {
+public class UsuarioImplement implements UsuarioService, UserDetailsService {
     private final UsuarioRepository repository;
 
     private final RolRepository rolRepository;
@@ -38,7 +42,7 @@ public class UsuarioImplement implements UsuarioService {
 
     private final MessageUtil messageUtil;
 
-    //private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
     public List<UsuarioResponse> listarUsuarios() {
         return usuarioResponseMapper.toUsuariolist(repository.findAll());
@@ -58,8 +62,7 @@ public class UsuarioImplement implements UsuarioService {
             throw new WithReferencesException(messageUtil.getMessage("UsuarioWithEmail", null, Locale.getDefault()));
         }
         Usuario usuario = usuarioMapper.toEntity(usuarioDto);
-        //usuario.setPassword(bCryptPasswordEncoder.encode(usuario.getPassword()));
-        //IMPLEMENTAR CON LA SEGURIDAD
+        usuario.setPassword(bCryptPasswordEncoder.encode(usuario.getPassword()));
         repository.save(usuario);
     }
     @Transactional
@@ -112,5 +115,14 @@ public class UsuarioImplement implements UsuarioService {
 
         repository.save(usuario);
         return usuarioMapper.toDto(usuario);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        final Usuario retrievedUser = repository.findByEmail(username).get();
+        if (retrievedUser == null) {
+            throw new UsernameNotFoundException("Invalid username or password");
+        }
+        return UserDetailsMapper.build(retrievedUser);
     }
 }
