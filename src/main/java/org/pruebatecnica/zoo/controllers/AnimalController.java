@@ -57,7 +57,7 @@ public class AnimalController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/fecha/{fecha}"})
     public ResponseEntity<?> findAnimalesFecha(@PathVariable String fecha) {
         return new ResponseEntity<>(service.animalesPorFecha(fecha), HttpStatus.OK);

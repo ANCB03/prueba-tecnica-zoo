@@ -59,7 +59,7 @@ public class ZonaController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/{id}/cantidad-animales"})
     public ResponseEntity<?> findCantidadAnimalesZona(@PathVariable int id) {
         return new ResponseEntity<>(service.cantidadAnimales(id), HttpStatus.OK);
