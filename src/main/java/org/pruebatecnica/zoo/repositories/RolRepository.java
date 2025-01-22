@@ -1,6 +1,5 @@
 package org.pruebatecnica.zoo.repositories;
 
-import org.pruebatecnica.zoo.entities.Especie;
 import org.pruebatecnica.zoo.entities.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

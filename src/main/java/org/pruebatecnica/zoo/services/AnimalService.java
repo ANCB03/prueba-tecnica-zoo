@@ -2,7 +2,6 @@ package org.pruebatecnica.zoo.services;
 
 import org.pruebatecnica.zoo.dtos.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface AnimalService {

@@ -19,10 +19,8 @@ import org.pruebatecnica.zoo.util.MessageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+
 @Service
 @RequiredArgsConstructor
 public class BusquedaImplement implements BusquedaService {
@@ -46,12 +44,21 @@ public class BusquedaImplement implements BusquedaService {
     private final ZonaMapper zonaMapper;
     @Transactional
     @Override
-    public Map<String, Object> busqueda(String palabra) {
+    public Map<String, Object> busquedaPalabra(String palabra) {
         if(!esUnaSolaPalabra(palabra)){
             throw new BadRequestException(messageUtil.getMessage("NoEsPalabra", null, Locale.getDefault()));
         }
-        List<Comentario> respuestas = comentarioRepository.findRespuestaByPalabra(palabra);
-        Map<String,Object> response = new HashMap<>();
+        return busquedaGeneral(palabra);
+    }
+
+    @Override
+    public Map<String, Object> busquedaGeneralTexto(String texto) {
+        return busquedaGeneral(texto);
+    }
+
+    private Map<String, Object> busquedaGeneral(String texto){
+        List<Comentario> respuestas = comentarioRepository.findRespuestaByPalabra(texto);
+        Map<String,Object> response = new TreeMap<>();
         int contador = 0;
         String resultado = "";
         if(!respuestas.isEmpty()){
@@ -61,7 +68,7 @@ public class BusquedaImplement implements BusquedaService {
                 response.put(resultado, comentarioResponseMapper.toDto(comentario));
             }
         }
-        List<Comentario> comentarios = comentarioRepository.findComentarioByPalabra(palabra);
+        List<Comentario> comentarios = comentarioRepository.findComentarioByPalabra(texto);
         if(!respuestas.isEmpty()){
             for(Comentario comentario: comentarios){
                 contador++;
@@ -69,7 +76,7 @@ public class BusquedaImplement implements BusquedaService {
                 response.put(resultado, comentarioResponseMapper.toDto(comentario));
             }
         }
-        List<Animal> animales = animalRepository.findByPalabra(palabra);
+        List<Animal> animales = animalRepository.findByPalabra(texto);
         if(!animales.isEmpty()){
             for(Animal animal: animales){
                 contador++;
@@ -77,7 +84,7 @@ public class BusquedaImplement implements BusquedaService {
                 response.put(resultado, animalResponseMapper.toDto(animal));
             }
         }
-        List<Especie> especies = especieRepository.findByPalabra(palabra);
+        List<Especie> especies = especieRepository.findByPalabra(texto);
         if(!especies.isEmpty()){
             for(Especie especie: especies){
                 contador++;
@@ -85,7 +92,7 @@ public class BusquedaImplement implements BusquedaService {
                 response.put(resultado, especieResponseMapper.toDto(especie));
             }
         }
-        List<Zona> zonas = zonaRepository.findByPalabra(palabra);
+        List<Zona> zonas = zonaRepository.findByPalabra(texto);
         if(!zonas.isEmpty()){
             for(Zona zona: zonas){
                 contador++;
@@ -95,8 +102,7 @@ public class BusquedaImplement implements BusquedaService {
         }
         return response;
     }
-
-    public boolean esUnaSolaPalabra(String input) {
+    private boolean esUnaSolaPalabra(String input) {
         if (input == null || input.isEmpty()) {
             return false; // No es válido si es nulo o vacío
         }

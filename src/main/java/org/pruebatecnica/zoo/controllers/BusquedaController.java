@@ -15,7 +15,13 @@ public class BusquedaController {
     private final BusquedaService busquedaService;
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/"})
-    public ResponseEntity<?> findComentario(@RequestParam String palabra) {
-        return new ResponseEntity<>(busquedaService.busqueda(palabra), HttpStatus.OK);
+    public ResponseEntity<?> busquedaPalabra(@RequestParam String palabra) {
+        return new ResponseEntity<>(busquedaService.busquedaPalabra(palabra), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
+    @GetMapping({"/texto"})
+    public ResponseEntity<?> busquedaTexto(@RequestParam String texto) {
+        return new ResponseEntity<>(busquedaService.busquedaGeneralTexto(texto), HttpStatus.OK);
     }
 }

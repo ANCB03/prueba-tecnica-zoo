@@ -1,10 +1,7 @@
 package org.pruebatecnica.zoo.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.pruebatecnica.zoo.dtos.AnimalDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
-import org.pruebatecnica.zoo.dtos.ZonaRequest;
-import org.pruebatecnica.zoo.services.AnimalService;
 import org.pruebatecnica.zoo.services.ZonaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

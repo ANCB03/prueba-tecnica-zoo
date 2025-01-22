@@ -3,7 +3,6 @@ package org.pruebatecnica.zoo.services;
 import org.pruebatecnica.zoo.dtos.CantidadAnimalesResponse;
 import org.pruebatecnica.zoo.dtos.ZonaCompletoDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
-import org.pruebatecnica.zoo.dtos.ZonaRequest;
 
 import java.util.List;
 

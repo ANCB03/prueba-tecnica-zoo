@@ -1,12 +1,10 @@
 package org.pruebatecnica.zoo.repositories;
 
 import org.pruebatecnica.zoo.entities.Comentario;
-import org.pruebatecnica.zoo.entities.Especie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ComentarioRepository extends JpaRepository<Comentario, Integer> {
     @Query(
