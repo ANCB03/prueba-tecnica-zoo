@@ -19,4 +19,10 @@ public interface ComentarioService {
     public ComentarioDto editarComentario(ComentarioDto comentarioDto);
 
     public PorcentajeComentariosResponse calcularPromedioComentariosRespuestas();
+
+    public void AgregarATablero(int idComentario);
+
+    public List<ComentarioDto> ListarComentariosTablero();
+
+    public List<ComentarioDto> ListadoComentariosAnimal(int idAnimal);
 }

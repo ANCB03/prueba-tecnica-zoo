@@ -24,7 +24,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfoMetaData() {
 
-        return new ApiInfoBuilder().title("Documentacion API Parqueadero")
+        return new ApiInfoBuilder().title("Documentacion API ZOO")
                 .description("Documentacion generada con swagger.")
                 .license("Apache 2.0")
                 .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")

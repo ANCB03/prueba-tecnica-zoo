@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true) // Habilitamos la securización de nuestra API con @Secured
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
 	private final BCryptPasswordEncoder encoder;
 

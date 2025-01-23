@@ -36,4 +36,16 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Integer>
             nativeQuery = true
     )
     List<Comentario> findComentarioByPalabra(String palabra);
+
+    @Query(
+            value = "SELECT * FROM comentario c where c.tablero = true",
+            nativeQuery = true
+    )
+    List<Comentario> findComentarioByTablero();
+
+    @Query(
+            value = "SELECT * FROM comentario c where c.tablero = true and c.id_animal = :idAnimal",
+            nativeQuery = true
+    )
+    List<Comentario> findComentariosByAnimal(int idAnimal);
 }

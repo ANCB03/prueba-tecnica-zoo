@@ -19,5 +19,5 @@ public class ZonaCompletoDto {
     @NotBlank(message = "se requiere el nombre de la zona")
     private String nombreZona;
 
-    private List<EspecieSinZonaDto> especies = new ArrayList<>();
+    private List<EspecieSinZonaResponse> especies = new ArrayList<>();
 }

@@ -61,4 +61,23 @@ public class ComentarioController {
     public ResponseEntity<?> findPorcentaje() {
         return new ResponseEntity<>(service.calcularPromedioComentariosRespuestas(), HttpStatus.OK);
     }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{id}/tablero")
+    public ResponseEntity<?> comentarioTablero(@PathVariable int id) {
+        service.AgregarATablero(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping({"/tablero"})
+    public ResponseEntity<?> findComentariosTablero() {
+        return new ResponseEntity<>(service.ListarComentariosTablero(), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping({"/tablero/animal/{id}"})
+    public ResponseEntity<?> findComentariosTableroAnimal(@PathVariable int id) {
+        return new ResponseEntity<>(service.ListadoComentariosAnimal(id), HttpStatus.OK);
+    }
 }

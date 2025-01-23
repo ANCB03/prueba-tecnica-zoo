@@ -121,4 +121,23 @@ public class ComentarioImplement implements ComentarioService {
         porcentajeComentariosResponse.setPorcentajeComentarios((double) comentariosConRespuestas / totalComentarios * 100);
         return porcentajeComentariosResponse;
     }
+
+    @Override
+    public void AgregarATablero(int idComentario) {
+        Comentario comentario = repository.findById(idComentario).orElseThrow(
+                () -> new NotFoundException(messageUtil.getMessage("ComentarioNotFound", null, Locale.getDefault()))
+        );
+        comentario.setTablero(!comentario.isTablero());
+        repository.save(comentario);
+    }
+
+    @Override
+    public List<ComentarioDto> ListarComentariosTablero() {
+        return comentarioMapper.toComentariolist(repository.findComentarioByTablero());
+    }
+
+    @Override
+    public List<ComentarioDto> ListadoComentariosAnimal(int idAnimal) {
+        return comentarioMapper.toComentariolist(repository.findComentariosByAnimal(idAnimal));
+    }
 }

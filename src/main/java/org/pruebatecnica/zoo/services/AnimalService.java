@@ -15,5 +15,5 @@ public interface AnimalService {
 
     public AnimalDto editarAnimal(AnimalDto animalDto);
 
-    public List<AnimalPorFechaResponse> animalesPorFecha(String fecha);
+    public List<AnimalResponse> animalesPorFecha(String fecha);
 }

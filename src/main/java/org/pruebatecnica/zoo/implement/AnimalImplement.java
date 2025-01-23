@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -104,25 +103,12 @@ public class AnimalImplement implements AnimalService {
     }
 
     @Override
-    public List<AnimalPorFechaResponse> animalesPorFecha(String fecha) {
+    public List<AnimalResponse> animalesPorFecha(String fecha) {
         if (esFechaValida(fecha)){
             LocalDate fecha1 = LocalDate.parse(fecha);
         List<Animal> animales = repository.findByFecha(fecha1);
         if (!animales.isEmpty()){
-            List<AnimalPorFechaResponse> animalesPorFechaResponses = new ArrayList<>();
-            for (Animal animal: animales){
-                AnimalPorFechaResponse animalPorFechaResponse = new AnimalPorFechaResponse();
-                animalPorFechaResponse.setIdAnimal(animal.getIdAnimal());
-                animalPorFechaResponse.setNombre(animal.getNombreAnimal());
-                animalPorFechaResponse.setFecha(animal.getFecha());
-                EspecieResponse especieResponse = new EspecieResponse();
-                especieResponse.setIdEspecie(animal.getEspecie().getIdEspecie());
-                especieResponse.setNombreEspecie(animal.getEspecie().getNombreEspecie());
-                especieResponse.setZona(zonaMapper.toDto(animal.getEspecie().getZona()));
-                animalPorFechaResponse.setEspecie(especieResponse);
-                animalesPorFechaResponses.add(animalPorFechaResponse);
-            }
-            return animalesPorFechaResponses;
+            return animalResponseMapper.toAnimallist(animales);
         }else{
             throw new NotFoundException(messageUtil.getMessage("AnimalPorFechaNotFound", null, Locale.getDefault()));
         }

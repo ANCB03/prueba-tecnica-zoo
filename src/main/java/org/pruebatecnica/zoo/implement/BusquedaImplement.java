@@ -64,7 +64,7 @@ public class BusquedaImplement implements BusquedaService {
         if(!respuestas.isEmpty()){
             for(Comentario comentario: respuestas){
                 contador++;
-                resultado = "resultado "+ String.valueOf(contador);
+                resultado = "resultado "+ contador;
                 response.put(resultado, comentarioResponseMapper.toDto(comentario));
             }
         }
@@ -72,7 +72,7 @@ public class BusquedaImplement implements BusquedaService {
         if(!respuestas.isEmpty()){
             for(Comentario comentario: comentarios){
                 contador++;
-                resultado = "resultado "+ String.valueOf(contador);
+                resultado = "resultado "+ contador;
                 response.put(resultado, comentarioResponseMapper.toDto(comentario));
             }
         }
@@ -80,7 +80,7 @@ public class BusquedaImplement implements BusquedaService {
         if(!animales.isEmpty()){
             for(Animal animal: animales){
                 contador++;
-                resultado = "resultado "+ String.valueOf(contador);
+                resultado = "resultado "+ contador;
                 response.put(resultado, animalResponseMapper.toDto(animal));
             }
         }
@@ -88,7 +88,7 @@ public class BusquedaImplement implements BusquedaService {
         if(!especies.isEmpty()){
             for(Especie especie: especies){
                 contador++;
-                resultado = "resultado "+ String.valueOf(contador);
+                resultado = "resultado "+ contador;
                 response.put(resultado, especieResponseMapper.toDto(especie));
             }
         }
@@ -96,7 +96,7 @@ public class BusquedaImplement implements BusquedaService {
         if(!zonas.isEmpty()){
             for(Zona zona: zonas){
                 contador++;
-                resultado = "resultado "+ String.valueOf(contador);
+                resultado = "resultado "+ contador;
                 response.put(resultado, zonaMapper.toDto(zona));
             }
         }

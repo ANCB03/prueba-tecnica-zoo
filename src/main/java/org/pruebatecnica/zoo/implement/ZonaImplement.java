@@ -1,6 +1,7 @@
 package org.pruebatecnica.zoo.implement;
 
 import lombok.RequiredArgsConstructor;
+import org.pruebatecnica.zoo.dtos.AnimalCompletoDto;
 import org.pruebatecnica.zoo.dtos.CantidadAnimalesResponse;
 import org.pruebatecnica.zoo.dtos.ZonaCompletoDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
