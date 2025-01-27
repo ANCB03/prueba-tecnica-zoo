@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EspecieCompletoDto {
+public class EspecieCompletoDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Min(value = 0, message = "El valor debe ser mayor o igual a 0.")
     private int idEspecie;
 

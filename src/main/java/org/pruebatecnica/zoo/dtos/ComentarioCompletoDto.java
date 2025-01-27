@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComentarioCompletoDto {
+public class ComentarioCompletoDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int idComentario;
 
     private String mensaje;

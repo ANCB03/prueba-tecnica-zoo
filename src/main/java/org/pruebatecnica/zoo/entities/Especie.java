@@ -1,6 +1,5 @@
 package org.pruebatecnica.zoo.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,7 @@ public class Especie implements Serializable {
     private Zona zona;
 
 
-    @JsonIgnoreProperties("especie")
+    //@JsonIgnoreProperties("especie")
     @OneToMany(mappedBy = "especie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Animal> animales = new ArrayList<>();
 }

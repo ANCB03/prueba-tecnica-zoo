@@ -8,12 +8,15 @@ import lombok.Setter;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioSinRolDto {
+public class UsuarioSinRolDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int idUsuario;
 
     @NotBlank(message = "Se requiere el nombre del usuario")
@@ -24,7 +27,7 @@ public class UsuarioSinRolDto {
 
     @NotBlank(message = "Se requiere el documento del usuario")
     @Pattern(
-            regexp = "^[0-9]{1,15}$",
+            regexp = "\\d{1,15}$",
             message = "El documento debe contener solo números y tener un máximo de 15 caracteres"
     )
     private String documento;

@@ -8,6 +8,7 @@ import org.pruebatecnica.zoo.dtos.PorcentajeComentariosResponse;
 import org.pruebatecnica.zoo.entities.Animal;
 import org.pruebatecnica.zoo.entities.Comentario;
 import org.pruebatecnica.zoo.entities.Usuario;
+import org.pruebatecnica.zoo.exceptions.BadRequestException;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.*;
@@ -16,6 +17,12 @@ import org.pruebatecnica.zoo.repositories.ComentarioRepository;
 import org.pruebatecnica.zoo.repositories.UsuarioRepository;
 import org.pruebatecnica.zoo.services.ComentarioService;
 import org.pruebatecnica.zoo.util.MessageUtil;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +48,23 @@ public class ComentarioImplement implements ComentarioService {
     private final ComentarioResponseMapper comentarioResponseMapper;
 
     private final MessageUtil messageUtil;
+    @Cacheable(value = "comentarioPageCache", key = "#page + '-' + #size")
     @Override
-    public List<ComentarioResponse> listarComentarios() {
-        return comentarioResponseMapper.toComentariolist(repository.findAll());
+    public Page<ComentarioResponse> listarComentarios(int page, int size) {
+        if(page <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorPage", null, Locale.getDefault()));
+        }else {
+            page--;
+        }
+        if(size <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorSize", null, Locale.getDefault()));
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Comentario> comentarios = repository.findAll(pageable);
+        return comentarios.map(comentarioResponseMapper::toDto);
     }
 
+    @CacheEvict(value = "comentarioPageCache", allEntries = true)
     @Override
     public void guardar(ComentarioDto comentarioDto) {
             Comentario comentario = new Comentario();
@@ -76,6 +95,7 @@ public class ComentarioImplement implements ComentarioService {
             repository.save(comentario);
     }
     @Transactional
+    @CacheEvict(value = {"comentarioCache", "comentarioPageCache"}, key = "#id", allEntries = true)
     @Override
     public void eliminar(int id) {
         Comentario comentario = repository.findById(id).orElseThrow(
@@ -87,6 +107,7 @@ public class ComentarioImplement implements ComentarioService {
         repository.deleteById(id);
     }
     @Transactional
+    @Cacheable(value = "comentarioCache", key = "#id")
     @Override
     public ComentarioCompletoDto encontrarComentarioById(int id) {
         return comentarioCompletoMapper.toDto(repository.findById(id).orElseThrow(
@@ -94,8 +115,10 @@ public class ComentarioImplement implements ComentarioService {
         ));
     }
     @Transactional
+    @CachePut(value = "comentarioCache", key = "#comentarioDto.idComentario")
+    @CacheEvict(value = "comentarioPageCache", allEntries = true)
     @Override
-    public ComentarioDto editarComentario(ComentarioDto comentarioDto) {
+    public ComentarioCompletoDto editarComentario(ComentarioDto comentarioDto) {
         Comentario comentario = repository.findById(comentarioDto.getIdComentario()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("ComentarioNotFound", null, Locale.getDefault()))
         );
@@ -105,7 +128,7 @@ public class ComentarioImplement implements ComentarioService {
         }
 
         repository.save(comentario);
-        return comentarioMapper.toDto(comentario);
+        return comentarioCompletoMapper.toDto(comentario);
     }
     @Transactional
     @Override
@@ -122,22 +145,25 @@ public class ComentarioImplement implements ComentarioService {
         return porcentajeComentariosResponse;
     }
 
+    @CachePut(value = "comentarioCache", key = "#comentarioDto.idComentario")
+    @CacheEvict(value = "comentarioPageCache", allEntries = true)
     @Override
-    public void AgregarATablero(int idComentario) {
+    public ComentarioCompletoDto agregarATablero(int idComentario) {
         Comentario comentario = repository.findById(idComentario).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("ComentarioNotFound", null, Locale.getDefault()))
         );
         comentario.setTablero(!comentario.isTablero());
         repository.save(comentario);
+        return comentarioCompletoMapper.toDto(comentario);
     }
 
     @Override
-    public List<ComentarioDto> ListarComentariosTablero() {
+    public List<ComentarioDto> listarComentariosTablero() {
         return comentarioMapper.toComentariolist(repository.findComentarioByTablero());
     }
 
     @Override
-    public List<ComentarioDto> ListadoComentariosAnimal(int idAnimal) {
+    public List<ComentarioDto> listadoComentariosAnimal(int idAnimal) {
         return comentarioMapper.toComentariolist(repository.findComentariosByAnimal(idAnimal));
     }
 }

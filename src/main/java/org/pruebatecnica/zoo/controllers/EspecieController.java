@@ -23,8 +23,9 @@ public class EspecieController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
     @GetMapping("/")
-    public ResponseEntity<?> EspecieList(){
-        return new ResponseEntity<>(service.listarEspecies(), HttpStatus.OK);
+    public ResponseEntity<?> EspecieList(@RequestParam(defaultValue = "1") int page,
+                                         @RequestParam(defaultValue = "10") int size){
+        return new ResponseEntity<>(service.listarEspecies(page, size), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")

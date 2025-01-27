@@ -35,15 +35,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    /*
-    @ExceptionHandler(PlacaException.class)
-    public ResponseEntity<?> placaException(PlacaException nfe){
-        response.clear();
-        response.put("mensaje", nfe.getMessage());
-        response.put("time", LocalDateTime.now());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }*/
-
     @ExceptionHandler(WithReferencesException.class)
     public ResponseEntity<?> WithReferences(WithReferencesException nfe){
         response.clear();

@@ -9,12 +9,15 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioDto {
+public class UsuarioDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int idUsuario;
 
     @NotBlank(message = "Se requiere el nombre del usuario")
@@ -25,7 +28,7 @@ public class UsuarioDto {
 
     @NotBlank(message = "Se requiere el documento del usuario")
     @Pattern(
-            regexp = "^[0-9]{1,15}$",
+            regexp = "\\d{1,15}$",
             message = "El documento debe contener solo números y tener un máximo de 15 caracteres"
     )
     private String documento;

@@ -23,8 +23,9 @@ public class AnimalController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
     @GetMapping("/")
-    public ResponseEntity<?> AnimalList(){
-        return new ResponseEntity<>(service.listarAnimaless(), HttpStatus.OK);
+    public ResponseEntity<?> AnimalList(@RequestParam(defaultValue = "1") int page,
+                                        @RequestParam(defaultValue = "10") int size){
+        return new ResponseEntity<>(service.listarAnimaless(page, size), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")

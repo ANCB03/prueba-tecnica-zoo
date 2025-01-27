@@ -24,8 +24,9 @@ public class RolController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
-    public ResponseEntity<?> RolList(){
-        return new ResponseEntity<>(service.listarRoles(), HttpStatus.OK);
+    public ResponseEntity<?> RolList(@RequestParam(defaultValue = "1") int page,
+                                     @RequestParam(defaultValue = "10") int size){
+        return new ResponseEntity<>(service.listarRoles(page, size), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -56,9 +57,8 @@ public class RolController {
     @PutMapping("/")
     public ResponseEntity<?> editParqueadero(@Valid @RequestBody RolDto rolDto) {
         response.clear();
-        RolDto rolDto1 = service.editarRol(rolDto);
+        service.editarRol(rolDto);
         response.put("message", "Rol editado");
-        response.put("rol", rolDto1);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 }

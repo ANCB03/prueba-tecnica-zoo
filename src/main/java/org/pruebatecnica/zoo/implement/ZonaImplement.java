@@ -1,12 +1,12 @@
 package org.pruebatecnica.zoo.implement;
 
 import lombok.RequiredArgsConstructor;
-import org.pruebatecnica.zoo.dtos.AnimalCompletoDto;
 import org.pruebatecnica.zoo.dtos.CantidadAnimalesResponse;
 import org.pruebatecnica.zoo.dtos.ZonaCompletoDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
 import org.pruebatecnica.zoo.entities.Especie;
 import org.pruebatecnica.zoo.entities.Zona;
+import org.pruebatecnica.zoo.exceptions.BadRequestException;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.ZonaCompletoMapper;
@@ -14,6 +14,12 @@ import org.pruebatecnica.zoo.mappers.ZonaMapper;
 import org.pruebatecnica.zoo.repositories.ZonaRepository;
 import org.pruebatecnica.zoo.services.ZonaService;
 import org.pruebatecnica.zoo.util.MessageUtil;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +37,23 @@ public class ZonaImplement implements ZonaService {
     private final ZonaCompletoMapper zonaCompletoMapper;
 
     private final MessageUtil messageUtil;
+    @Cacheable(value = "zonaPageCache", key = "#page + '-' + #size")
     @Override
-    public List<ZonaDto> listarZonas() {
-        return zonaMapper.toZonalist(repository.findAll());
+    public Page<ZonaDto> listarZonas(int page, int size) {
+        if(page <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorPage", null, Locale.getDefault()));
+        }else {
+            page--;
+        }
+        if(size <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorSize", null, Locale.getDefault()));
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Zona> zonas = repository.findAll(pageable);
+        return zonas.map(zonaMapper::toDto);
     }
 
+    @CacheEvict(value = "zonaPageCache", allEntries = true)
     @Override
     public void guardar(ZonaDto zonaDto) {
         Optional<Zona> zonaFound = repository.findByNombre(zonaDto.getNombreZona());
@@ -46,6 +64,7 @@ public class ZonaImplement implements ZonaService {
     }
 
     @Transactional
+    @CacheEvict(value = {"zonaCache", "zonaPageCache"}, key = "#id", allEntries = true)
     @Override
     public void eliminar(int id) {
         Zona zona = repository.findById(id).orElseThrow(
@@ -66,6 +85,7 @@ public class ZonaImplement implements ZonaService {
     }
 
     @Transactional
+    @Cacheable(value = "zonaCache", key = "#id")
     @Override
     public ZonaCompletoDto encontrarZonaById(int id) {
         return zonaCompletoMapper.toDto(repository.findById(id).orElseThrow(
@@ -73,8 +93,10 @@ public class ZonaImplement implements ZonaService {
         ));
     }
 
+    @CachePut(value = "zonaCache", key = "#zonaDto.idZona")
+    @CacheEvict(value = "zonaPageCache", allEntries = true)
     @Override
-    public ZonaDto editarZona(ZonaDto zonaDto) {
+    public ZonaCompletoDto editarZona(ZonaDto zonaDto) {
         Zona zona = repository.findById(zonaDto.getIdZona()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("ZonaNotFound", null, Locale.getDefault()))
         );
@@ -85,7 +107,7 @@ public class ZonaImplement implements ZonaService {
             zona.setNombreZona(zonaDto.getNombreZona());
         }
         repository.save(zona);
-        return zonaMapper.toDto(zona);
+        return zonaCompletoMapper.toDto(zona);
     }
     @Transactional
     @Override

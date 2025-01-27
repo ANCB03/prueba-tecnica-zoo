@@ -4,11 +4,12 @@ import org.pruebatecnica.zoo.dtos.ComentarioCompletoDto;
 import org.pruebatecnica.zoo.dtos.ComentarioDto;
 import org.pruebatecnica.zoo.dtos.ComentarioResponse;
 import org.pruebatecnica.zoo.dtos.PorcentajeComentariosResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface ComentarioService {
-    public List<ComentarioResponse> listarComentarios();
+    public Page<ComentarioResponse> listarComentarios(int page, int size);
 
     public void guardar(ComentarioDto comentarioDto);
 
@@ -16,13 +17,13 @@ public interface ComentarioService {
 
     public ComentarioCompletoDto encontrarComentarioById(int id);
 
-    public ComentarioDto editarComentario(ComentarioDto comentarioDto);
+    public ComentarioCompletoDto editarComentario(ComentarioDto comentarioDto);
 
     public PorcentajeComentariosResponse calcularPromedioComentariosRespuestas();
 
-    public void AgregarATablero(int idComentario);
+    public ComentarioCompletoDto agregarATablero(int idComentario);
 
-    public List<ComentarioDto> ListarComentariosTablero();
+    public List<ComentarioDto> listarComentariosTablero();
 
-    public List<ComentarioDto> ListadoComentariosAnimal(int idAnimal);
+    public List<ComentarioDto> listadoComentariosAnimal(int idAnimal);
 }

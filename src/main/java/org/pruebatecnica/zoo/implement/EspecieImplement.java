@@ -7,19 +7,24 @@ import org.pruebatecnica.zoo.dtos.EspecieDto;
 import org.pruebatecnica.zoo.dtos.EspecieResponse;
 import org.pruebatecnica.zoo.entities.Especie;
 import org.pruebatecnica.zoo.entities.Zona;
+import org.pruebatecnica.zoo.exceptions.BadRequestException;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.EspecieCompletoMapper;
-import org.pruebatecnica.zoo.mappers.EspecieMapper;
 import org.pruebatecnica.zoo.mappers.EspecieResponseMapper;
 import org.pruebatecnica.zoo.repositories.EspecieRepository;
 import org.pruebatecnica.zoo.repositories.ZonaRepository;
 import org.pruebatecnica.zoo.services.EspecieService;
 import org.pruebatecnica.zoo.util.MessageUtil;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -30,18 +35,28 @@ public class EspecieImplement implements EspecieService {
 
     private final ZonaRepository zonaRepository;
 
-    private final EspecieMapper especieMapper;
-
     private final EspecieResponseMapper especieResponseMapper;
 
     private final EspecieCompletoMapper especieCompletoMapper;
 
     private final MessageUtil messageUtil;
+    @Cacheable(value = "especiePageCache", key = "#page + '-' + #size")
     @Override
-    public List<EspecieResponse> listarEspecies() {
-        return especieResponseMapper.toEspecielist(repository.findAll());
+    public Page<EspecieResponse> listarEspecies(int page, int size) {
+        if(page <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorPage", null, Locale.getDefault()));
+        }else {
+            page--;
+        }
+        if(size <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorSize", null, Locale.getDefault()));
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Especie> especies = repository.findAll(pageable);
+        return especies.map(especieResponseMapper::toDto);
     }
 
+    @CacheEvict(value = "especiePageCache", allEntries = true)
     @Override
     public void guardar(EspecieDto especieDto) {
                 Optional<Especie> especieFound = repository.findByNombre(especieDto.getNombreEspecie());
@@ -59,6 +74,7 @@ public class EspecieImplement implements EspecieService {
                 }
     }
     @Transactional
+    @CacheEvict(value = {"especieCache", "especiePageCache"}, key = "#id", allEntries = true)
     @Override
     public void eliminar(int id) {
         Especie especie = repository.findById(id).orElseThrow(
@@ -71,6 +87,7 @@ public class EspecieImplement implements EspecieService {
         }
     }
     @Transactional
+    @Cacheable(value = "especieCache", key = "#id")
     @Override
     public EspecieCompletoDto encontrarEspecieById(int id) {
         return especieCompletoMapper.toDto(repository.findById(id).orElseThrow(
@@ -78,8 +95,10 @@ public class EspecieImplement implements EspecieService {
         ));
     }
     @Transactional
+    @CachePut(value = "especieCache", key = "#especieDto.idEspecie")
+    @CacheEvict(value = "especiePageCache", allEntries = true)
     @Override
-    public EspecieDto editarEspecie(EspecieDto especieDto) {
+    public EspecieCompletoDto editarEspecie(EspecieDto especieDto) {
         Especie especie = repository.findById(especieDto.getIdEspecie()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("EspecieNotFound", null, Locale.getDefault()))
         );
@@ -100,7 +119,7 @@ public class EspecieImplement implements EspecieService {
             especie.setZona(zona);
         }
         repository.save(especie);
-        return especieMapper.toDto(especie);
+        return especieCompletoMapper.toDto(especie);
     }
     @Transactional
     @Override

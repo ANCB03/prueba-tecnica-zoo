@@ -3,11 +3,10 @@ package org.pruebatecnica.zoo.services;
 import org.pruebatecnica.zoo.dtos.CantidadAnimalesResponse;
 import org.pruebatecnica.zoo.dtos.ZonaCompletoDto;
 import org.pruebatecnica.zoo.dtos.ZonaDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ZonaService {
-    public List<ZonaDto> listarZonas();
+    public Page<ZonaDto> listarZonas(int page, int size);
 
     public void guardar(ZonaDto zonaDto);
 
@@ -15,7 +14,7 @@ public interface ZonaService {
 
     public ZonaCompletoDto encontrarZonaById(int id);
 
-    public ZonaDto editarZona(ZonaDto zonaDto);
+    public ZonaCompletoDto editarZona(ZonaDto zonaDto);
 
     public CantidadAnimalesResponse cantidadAnimales(int idZona);
 }

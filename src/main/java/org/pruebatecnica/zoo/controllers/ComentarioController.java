@@ -23,8 +23,9 @@ public class ComentarioController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
-    public ResponseEntity<?> ComentarioList(){
-        return new ResponseEntity<>(service.listarComentarios(), HttpStatus.OK);
+    public ResponseEntity<?> ComentarioList(@RequestParam(defaultValue = "1") int page,
+                                            @RequestParam(defaultValue = "10") int size){
+        return new ResponseEntity<>(service.listarComentarios(page,size), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -65,19 +66,19 @@ public class ComentarioController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/tablero")
     public ResponseEntity<?> comentarioTablero(@PathVariable int id) {
-        service.AgregarATablero(id);
+        service.agregarATablero(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/tablero"})
     public ResponseEntity<?> findComentariosTablero() {
-        return new ResponseEntity<>(service.ListarComentariosTablero(), HttpStatus.OK);
+        return new ResponseEntity<>(service.listarComentariosTablero(), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping({"/tablero/animal/{id}"})
     public ResponseEntity<?> findComentariosTableroAnimal(@PathVariable int id) {
-        return new ResponseEntity<>(service.ListadoComentariosAnimal(id), HttpStatus.OK);
+        return new ResponseEntity<>(service.listadoComentariosAnimal(id), HttpStatus.OK);
     }
 }

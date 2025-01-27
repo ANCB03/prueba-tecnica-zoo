@@ -3,11 +3,11 @@ package org.pruebatecnica.zoo.services;
 import org.pruebatecnica.zoo.dtos.UsuarioCompletoDto;
 import org.pruebatecnica.zoo.dtos.UsuarioDto;
 import org.pruebatecnica.zoo.dtos.UsuarioResponse;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 public interface UsuarioService {
-    public List<UsuarioResponse> listarUsuarios();
+    public Page<UsuarioResponse> listarUsuarios(int page, int size);
 
     public void guardar(UsuarioDto usuarioDto);
 
@@ -15,5 +15,5 @@ public interface UsuarioService {
 
     public UsuarioCompletoDto encontrarUsuarioById(int id);
 
-    public UsuarioDto editarUsuario(UsuarioDto usuarioDto);
+    public UsuarioCompletoDto editarUsuario(UsuarioDto usuarioDto);
 }

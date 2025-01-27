@@ -23,8 +23,9 @@ public class UsuarioController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
-    public ResponseEntity<?> UsuarioList(){
-        return new ResponseEntity<>(service.listarUsuarios(), HttpStatus.OK);
+    public ResponseEntity<?> UsuarioList(@RequestParam(defaultValue = "1") int page,
+                                         @RequestParam(defaultValue = "10") int size){
+        return new ResponseEntity<>(service.listarUsuarios(page, size), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

@@ -6,6 +6,7 @@ import org.pruebatecnica.zoo.dtos.UsuarioDto;
 import org.pruebatecnica.zoo.dtos.UsuarioResponse;
 import org.pruebatecnica.zoo.entities.Rol;
 import org.pruebatecnica.zoo.entities.Usuario;
+import org.pruebatecnica.zoo.exceptions.BadRequestException;
 import org.pruebatecnica.zoo.exceptions.NotFoundException;
 import org.pruebatecnica.zoo.exceptions.WithReferencesException;
 import org.pruebatecnica.zoo.mappers.UserDetailsMapper;
@@ -16,6 +17,12 @@ import org.pruebatecnica.zoo.repositories.RolRepository;
 import org.pruebatecnica.zoo.repositories.UsuarioRepository;
 import org.pruebatecnica.zoo.services.UsuarioService;
 import org.pruebatecnica.zoo.util.MessageUtil;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +30,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -43,11 +49,23 @@ public class UsuarioImplement implements UsuarioService, UserDetailsService {
     private final MessageUtil messageUtil;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Cacheable(value = "usuarioPageCache", key = "#page + '-' + #size")
     @Override
-    public List<UsuarioResponse> listarUsuarios() {
-        return usuarioResponseMapper.toUsuariolist(repository.findAll());
+    public Page<UsuarioResponse> listarUsuarios(int page, int size) {
+        if(page <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorPage", null, Locale.getDefault()));
+        }else {
+            page--;
+        }
+        if(size <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorSize", null, Locale.getDefault()));
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Usuario> usuarios = repository.findAll(pageable);
+        return usuarios.map(usuarioResponseMapper::toDto);
     }
 
+    @CacheEvict(value = "usuarioPageCache", allEntries = true)
     @Override
     public void guardar(UsuarioDto usuarioDto) {
         Optional<Usuario> usuarioExistente = repository.findByDocumento(usuarioDto.getDocumento());
@@ -66,6 +84,7 @@ public class UsuarioImplement implements UsuarioService, UserDetailsService {
         repository.save(usuario);
     }
     @Transactional
+    @CacheEvict(value = {"usuarioCache", "usuarioPageCache"}, key = "#id", allEntries = true)
     @Override
     public void eliminar(int id) {
         Usuario usuario = repository.findById(id).orElseThrow(
@@ -77,6 +96,7 @@ public class UsuarioImplement implements UsuarioService, UserDetailsService {
         repository.deleteById(id);
     }
     @Transactional
+    @Cacheable(value = "usuarioCache", key = "#id")
     @Override
     public UsuarioCompletoDto encontrarUsuarioById(int id) {
         return usuarioCompletoMapper.toDto(repository.findById(id).orElseThrow(
@@ -84,8 +104,10 @@ public class UsuarioImplement implements UsuarioService, UserDetailsService {
         ));
     }
     @Transactional
+    @CachePut(value = "usuarioCache", key = "#usuarioDto.idUsuario")
+    @CacheEvict(value = "usuarioPageCache", allEntries = true)
     @Override
-    public UsuarioDto editarUsuario(UsuarioDto usuarioDto) {
+    public UsuarioCompletoDto editarUsuario(UsuarioDto usuarioDto) {
         Usuario usuario = repository.findById(usuarioDto.getIdUsuario()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("UsuarioNotFound",null, Locale.getDefault()))
         );
@@ -114,7 +136,7 @@ public class UsuarioImplement implements UsuarioService, UserDetailsService {
             usuario.setEmail(usuarioDto.getEmail());
 
         repository.save(usuario);
-        return usuarioMapper.toDto(usuario);
+        return usuarioCompletoMapper.toDto(usuario);
     }
 
     @Override

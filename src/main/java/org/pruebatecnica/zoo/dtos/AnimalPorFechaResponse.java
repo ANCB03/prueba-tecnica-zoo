@@ -5,13 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnimalPorFechaResponse {
+public class AnimalPorFechaResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int idAnimal;
 
     private String nombre;

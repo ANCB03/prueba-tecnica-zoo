@@ -14,6 +14,12 @@ import org.pruebatecnica.zoo.repositories.AnimalRepository;
 import org.pruebatecnica.zoo.repositories.EspecieRepository;
 import org.pruebatecnica.zoo.services.AnimalService;
 import org.pruebatecnica.zoo.util.MessageUtil;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,11 +49,23 @@ public class AnimalImplement implements AnimalService {
     private final AnimalCompletoMapper animalCompletoMapper;
 
     private final MessageUtil messageUtil;
+    @Cacheable(value = "animalPageCache", key = "#page + '-' + #size")
     @Override
-    public List<AnimalResponse> listarAnimaless() {
-        return animalResponseMapper.toAnimallist(repository.findAll());
+    public Page<AnimalResponse> listarAnimaless(int page, int size) {
+        if(page <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorPage", null, Locale.getDefault()));
+        }else {
+            page--;
+        }
+        if(size <= 0){
+            throw  new BadRequestException(messageUtil.getMessage("ErrorSize", null, Locale.getDefault()));
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Animal> animales = repository.findAll(pageable);
+        return animales.map(animalResponseMapper::toDto);
     }
 
+    @CacheEvict(value = "animalPageCache", allEntries = true)
     @Override
     public void guardar(AnimalDto animalDto) {
         Optional<Especie> especieFound = especieRepository.findById(animalDto.getIdEspecie());
@@ -61,6 +79,7 @@ public class AnimalImplement implements AnimalService {
         repository.save(animalMapper.toEntity(animalDto));
     }
 
+    @CacheEvict(value = {"animalCache", "animalPageCache"}, key = "#id", allEntries = true)
     @Override
     public void eliminar(int id) {
         repository.findById(id).orElseThrow(
@@ -69,15 +88,18 @@ public class AnimalImplement implements AnimalService {
         repository.deleteById(id);
     }
     @Transactional
+    @Cacheable(value = "animalCache", key = "#id")
     @Override
     public AnimalCompletoDto encontrarAnimalById(int id) {
         return animalCompletoMapper.toDto(repository.findById(id).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("AnimalNotFound", null, Locale.getDefault()))
         ));
     }
+    @CachePut(value = "animalCache", key = "#animalDto.idAnimal")
+    @CacheEvict(value = "animalPageCache", allEntries = true)
     @Transactional
     @Override
-    public AnimalDto editarAnimal(AnimalDto animalDto) {
+    public AnimalCompletoDto editarAnimal(AnimalDto animalDto) {
         Animal animal = repository.findById(animalDto.getIdAnimal()).orElseThrow(
                 () -> new NotFoundException(messageUtil.getMessage("AnimalNotFound", null, Locale.getDefault()))
         );
@@ -99,9 +121,10 @@ public class AnimalImplement implements AnimalService {
         }
 
         repository.save(animal);
-        return animalMapper.toDto(animal);
+        return animalCompletoMapper.toDto(animal);
     }
 
+    @Cacheable(value = "animalFechaCache", key = "#fecha")
     @Override
     public List<AnimalResponse> animalesPorFecha(String fecha) {
         if (esFechaValida(fecha)){

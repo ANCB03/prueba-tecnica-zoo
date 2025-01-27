@@ -18,7 +18,6 @@ public class AuthorizationRequest implements Serializable {
 	private String userName;
 
 	private String password;
-
 	public AuthorizationRequest() {
 	}
 }

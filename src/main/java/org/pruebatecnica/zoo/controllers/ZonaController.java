@@ -23,8 +23,9 @@ public class ZonaController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")
     @GetMapping("/")
-    public ResponseEntity<?> ZonaList(){
-        return new ResponseEntity<>(service.listarZonas(), HttpStatus.OK);
+    public ResponseEntity<?> ZonaList(@RequestParam(defaultValue = "1") int page,
+                                      @RequestParam(defaultValue = "10") int size){
+        return new ResponseEntity<>(service.listarZonas(page, size), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLEADO')")

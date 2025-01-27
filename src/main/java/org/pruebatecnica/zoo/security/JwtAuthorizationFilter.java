@@ -32,7 +32,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 		String authorizationHeader = httpServletRequest.getHeader(Constants.HEADER_AUTHORIZATION_KEY);
 
-		if (StringUtils.isEmpty(authorizationHeader) || !authorizationHeader
+		if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader
 				.startsWith(Constants.TOKEN_BEARER_PREFIX)) {
 			filterChain.doFilter(httpServletRequest, httpServletResponse);
 			return;

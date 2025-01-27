@@ -7,13 +7,15 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnimalDto {
+public class AnimalDto implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private int idAnimal;
 

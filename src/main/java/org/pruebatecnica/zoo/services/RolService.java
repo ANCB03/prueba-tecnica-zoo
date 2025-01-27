@@ -3,11 +3,10 @@ package org.pruebatecnica.zoo.services;
 
 import org.pruebatecnica.zoo.dtos.RolCompletoDto;
 import org.pruebatecnica.zoo.dtos.RolDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface RolService {
-    public List<RolDto> listarRoles();
+    public Page<RolDto> listarRoles(int page, int size);
 
     public void guardar(RolDto rolDto);
 
@@ -15,5 +14,5 @@ public interface RolService {
 
     public RolCompletoDto encontrarRolById(int id);
 
-    public RolDto editarRol(RolDto rolDto);
+    public RolCompletoDto editarRol(RolDto rolDto);
 }

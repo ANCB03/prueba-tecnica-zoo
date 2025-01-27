@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnimalCompletoDto {
+public class AnimalCompletoDto implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int idAnimal;
 
     @NotBlank(message = "se requiere el nombre del animal")

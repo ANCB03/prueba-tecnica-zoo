@@ -7,12 +7,15 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComentarioSinAutorDto {
+public class ComentarioSinAutorDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int idComentario;
 
     @NotBlank(message = "se requiere el mensaje del comentario")
